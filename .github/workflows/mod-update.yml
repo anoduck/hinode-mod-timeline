@@ -1,0 +1,16 @@
+name: Update Hugo dependencies
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *' # run daily at 03:00 AM
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  mod-update:
+    uses: gethinode/.github/.github/workflows/mod-update.yml@v1
+    with:
+      package-manager: pnpm
+    secrets: inherit

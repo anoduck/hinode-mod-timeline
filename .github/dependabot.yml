@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: fix
+      include: scope
+    versioning-strategy: increase
+    # Must stay strictly greater than .npmrc#minimum-release-age (1440 min = 1 day).
+    # Cooldown is day-granular, so 2 is the smallest value that clears the gate;
+    # below it pnpm fails CI with ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION.
+    cooldown:
+      default-days: 2
+      exclude:
+        - "@gethinode/*" # mirrors pnpm-workspace.yaml#minimumReleaseAgeExclude

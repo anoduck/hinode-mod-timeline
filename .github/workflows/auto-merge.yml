@@ -1,0 +1,12 @@
+# Source: https://nicolasiensen.github.io/2022-07-23-automating-dependency-updates-with-dependabot-github-auto-merge-and-github-actions/
+name: PR auto-merge
+on: pull_request_target
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  auto-merge:
+    uses: gethinode/.github/.github/workflows/auto-merge.yml@v1
+    secrets: inherit

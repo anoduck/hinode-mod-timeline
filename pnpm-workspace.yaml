@@ -1,0 +1,19 @@
+# pnpm reads this for repo-wide settings even without sub-packages.
+# allowBuilds is the v11 gate for which deps may run install scripts. Keep tight.
+allowBuilds:
+  hugo-extended: true # downloads the platform-specific Hugo binary
+  # add more only when a postinstall failure is investigated and trusted
+minimumReleaseAgeExclude:
+  - "@gethinode/*"
+
+# Force-patch transitive dependencies flagged by `pnpm audit`.
+# adm-zip: hugo-extended pins ^0.5.17; force >=0.6.1 to cover the
+#   crafted-ZIP allocation DoS (GHSA-xcpc-8h2w-3j85) and destination-symlink
+#   overwrite (GHSA-vwc7-r8mq-g2x9).
+# Drop each override once the upstream dependency ranges resolve patched
+# versions without assistance.
+overrides:
+  adm-zip: ">=0.6.1"
+  # fast-uri: fixes Ajv URI scheme, host, and reference validation (GHSA-w74x-v6f9-j3xg,
+  # GHSA-xhq7-xmqj-769h, GHSA-wjr9-j795-jxcr, GHSA-333x-w4r6-6crp).
+  fast-uri@3: "^3.1.9"

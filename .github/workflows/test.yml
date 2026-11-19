@@ -1,0 +1,17 @@
+name: Test
+on:
+  workflow_dispatch:
+  # TODO: uncomment
+  # push:
+  #   tags:
+  #     - v*
+  #   branches: [ main ]
+  # pull_request:
+  #   branches: [ main ]
+
+jobs:
+  test:
+    uses: gethinode/.github/.github/workflows/test.yml@v1
+    with:
+      package-manager: pnpm
+    secrets: inherit
