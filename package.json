@@ -1,7 +1,7 @@
 {
   "name": "@gethinode/mod-template",
   "version": "0.0.0-semantically-released",
-  "packageManager": "pnpm@11.8.0+sha512.c1f5e7c4cb241c8f174b743851d82f42b802324afc8b0f116b96adb15aa06664948dde36960a3ba1079ba5b4b29dd0140135b94b5b5f5263592249d68e555f26",
+  "packageManager": "npm@11.8.0+sha512.c1f5e7c4cb241c8f174b743851d82f42b802324afc8b0f116b96adb15aa06664948dde36960a3ba1079ba5b4b29dd0140135b94b5b5f5263592249d68e555f26",
   "description": "A template to define a Hugo module compatible with Hinode",
   "keywords": [
     "hugo",
@@ -13,18 +13,29 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "prestart": "pnpm clean && pnpm mod:vendor",
+    "prestart": "npm run clean && npm run mod:vendor",
     "start": "hugo server -s exampleSite --bind=0.0.0.0 --disableFastRender --printI18nWarnings",
-    "prebuild": "pnpm clean && pnpm mod:vendor",
+    "prebuild": "npm run clean && npm run mod:vendor",
     "build": "hugo --gc --minify -s exampleSite",
     "clean": "rimraf exampleSite/public exampleSite/resources",
     "mod:clean": "hugo mod clean",
-    "mod:update": "rimraf _vendor && hugo mod get -u ./... && hugo mod get -u && pnpm mod:vendor && pnpm mod:tidy",
+    "mod:update": "rimraf _vendor && hugo mod get -u ./... && hugo mod get -u && npm run mod:vendor && npm run mod:tidy",
     "mod:tidy": "hugo mod tidy",
     "mod:vendor": "rimraf _vendor && hugo mod vendor",
-    "postinstall": "echo TODO: add postinstall instructions",
-    "test": "pnpm build",
-    "upgrade": "pnpm dlx npm-check-updates -u && pnpm mod:update",
+    "postinstall": "npm run -s copy:style && npm run -s copy:script && npm run -s copy:data",
+    "copy:style": "npm run -s copy:main && npm run -s copy:css && npm run -s copy:font && npm run -s copy:icons && npm run -s icons:rexrep && npm run -s copy:themes",
+    "copy:css": "cpy node_modules/@knight-lab/timelinejs/dist/css/timeline.css dist/scss --rename=timeline.scss --flat",
+    "copy:font": "cpy node_modules/@knight-lab/timelinejs/dist/css/fonts/font.default.css dist/scss --rename=font.default.scss --flat",
+    "copy:icons": "cpy node_modules/@knight-lab/timelinejs/dist/css/icons dist/icons --flat",
+    "copy:themes": "cpy node_modules/@knight-lab/timelinejs/dist/css/themes/timeline.theme.dark.css dist/scss --rename=timeline.dark.scss --flat",
+    "copy:main": "cpy contrib/main.scss dist/scss --flat",
+    "copy:script": "npm run -s copy:js && npm run -s copy:ajs",
+    "copy:js": "cpy node_modules/@knight-lab/timelinejs/dist/js/timeline.js dist/js --flat",
+    "copy:ajs": "cpy contrib/autoload.js dist/js --flat",
+    "copy:data": "cpy static/timelinejs.json exampleSite/static/timelinejs.json",
+    "icons:rexrep": "rexreplace '../js/../css/icons/' '/icons/' dist/scss/timeline.scss",
+    "test": "npm run build",
+    "upgrade": "npm dlx npm-check-updates -u && npm run mod:update",
     "prepare": "node .husky/install.mjs"
   },
   "repository": {
@@ -40,11 +51,17 @@
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
+    "@knight-lab/timelinejs": "^3.9.13",
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^11.0.1",
+    "commitizen": "^4.3.2",
     "cpy-cli": "^7.0.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "diff": "^9.0.0",
     "hugo-extended": "^0.169.0",
     "husky": "^9.1.7",
+    "postcss-cli": "^12.0.0",
+    "rexreplace": "^7.1.16",
     "rimraf": "^6.1.4",
     "semantic-release": "^26.0.0"
   },
@@ -57,7 +74,7 @@
       [
         "@semantic-release/exec",
         {
-          "prepare": "pnpm install --frozen-lockfile"
+          "prepare": "npm install --frozen-lockfile"
         }
       ],
       [
@@ -66,11 +83,35 @@
           "assets": [
             "dist",
             "package.json",
-            "pnpm-lock.yaml"
+            "npm-lock.yaml"
           ],
           "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
         }
       ]
     ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "comments": {
+    "dependencies": {},
+    "devDependencies": {
+      "@commitlint/cli": "project",
+      "@commitlint/config-conventional": "project",
+      "@knight-lab/timelinejs": "project",
+      "@semantic-release/exec": "project",
+      "@semantic-release/git": "project",
+      "commitizen": "project",
+      "cpy-cli": "project",
+      "cz-conventional-changelog": "project",
+      "diff": "project",
+      "hugo-bin": "project",
+      "husky": "project",
+      "rexreplace": "project",
+      "rimraf": "project",
+      "semantic-release": "project"
+    }
   }
 }
