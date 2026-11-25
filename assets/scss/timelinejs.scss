@@ -1,0 +1,40 @@
+@import 'timeline';
+@import 'font.default';
+// @import 'timeline.dark';
+
+@mixin bust-out-of($container-width, $max-width: null) {
+  @if not $container-width or not $max-width {
+    // Longhand, because you may not want to override existing vertical margins
+    margin-left:  calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    // The required math gets really ugly without this, but you were using it anyway, right?
+    box-sizing: border-box;
+  } @else {
+    width: if($max-width, $max-width, null);
+    // Non-Firefox browsers include the scrollbar in `vw`, be careful; maybe set this to 98vw depending on your site.
+    max-width: 100vw;
+    transform: translateX(calc(50vw - 50%));
+
+    @media (min-width: $container-width) {
+      // Longhand, because you may not want to override existing vertical margins
+      margin-left:  calc(50% - 50vw);
+      margin-right: calc(50% - 50vw);
+    }
+  }
+}
+
+.tl-container {
+  display: block;
+  object-fit: cover;
+  @include bust-out-of(92em);
+
+  .tl-timenav {
+    min-height: 150px;
+  }
+
+  .tl-storyslider {
+    min-height: 400px;
+  }
+}
+
+html { overflow-x:hidden }

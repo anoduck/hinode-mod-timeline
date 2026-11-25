@@ -1,0 +1,75 @@
+<!--
+    Licensed under MIT License 2024, Anoduck, The Anonymous Duck
+    https://anoduck.mit-license.org
+
+    Hinode is a creation of The Hinode Team / I.E. Mark Dumay -> Of, which all credit and property rights are due.
+
+    TimelineJS is created by The Knight Labs at The NorthWestern University School of Engineering, for which, all credit and property rights are due.
+-->
+<!--
+    Copyright � 2024 The Hinode Team / Mark Dumay. All rights reserved.
+    Use of this source code is governed by The MIT License (MIT) that can be found in the LICENSE file.
+    Visit gethinode.com/license for more details.
+-->
+
+<!-- Check for valid arguments -->
+{{- $error := false -}}
+
+<!-- Initialize arguments -->
+{{- $file := . -}}
+{{- $blockId := "" -}}
+{{- $tlData := "" -}}
+{{- $dataAttr := "" -}}
+{{- $debug := "" | default false -}}
+
+<!-- Set debug -->
+{{- if .Site.Params.modules.timelinejs.debug }}
+    {{- $debug = true -}}
+{{ end }}
+
+<!-- Check if named and Get -->
+{{- if .IsNamedParams }}
+    <!-- Define Variables -->
+    {{- $blockId = .Get "blockId" | default "timeline-element" -}}
+    {{- $tlData = .Get "tlData" -}}
+{{ else }}
+    {{- $blockId = .Get 0 | default "timeline-element" -}}
+    {{- $tlData = .Get 1 -}}
+{{ end }}
+
+<!-- define types -->
+{{- $jsonType := hasSuffix $tlData ".json" -}}
+{{- $htmlType := hasPrefix $tlData "https://docs.google.com/spreadsheets/" -}}
+
+<!-- test for types -->
+{{- if $jsonType }}
+    {{- $dataAttr = $tlData | urlize -}}
+{{ else if $htmlType }}
+    {{- $dataAttr = $tlData | safeURL -}}
+{{ else }}
+    {{ errorf "The %q shortcode requires a valid 'tlData' argument, which is either a valid JSON file or a Google Sheets URL. Please review your syntax on %s" $file.Name $file.Position }}
+    {{ errorf "tldata retrieved as %s" $tlData }}
+    {{ errorf "jsonType rendered as %s" $jsonType }}
+    {{ errorf "htmlType rendered as %s" $htmlType }}
+    {{ errorf "tldata rendered as %s" $dataAttr }}
+{{ end }}
+
+<!-- Inject div element -->
+<div class="tl-container" id="timeline-container">
+    <div id={{ $blockId | anchorize }} data-name={{ $dataAttr | safeHTML }} data-debug={{ $debug | safeHTML }}></div>
+</div>
+
+<!-- Provide debug information -->
+{{- if $debug }}
+    <p> The following values were used in the above timelinejs element</p>
+    <ul>
+        <li>Original Timeline Data = {{ $tlData }} </li>
+        <li>Block ID = {{ $blockId | safeHTML }}</li>
+        <li>Rendered Timeline Data = {{ $dataAttr  }} </li>
+    </ul>
+    {{- if .Site.Params.enableDarkMode }}
+        <p>Dark Mode has been enabled for this site.</p>
+        <p class="d-none-dark">The current mode is: <mark>light mode</mark><p/>
+        <p class="d-none-light">The current mode is: <mark>dark mode</mark><p/>
+    {{ end }}
+{{ end }}
