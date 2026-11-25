@@ -1,22 +1,15 @@
-{{/* Declare the styles slice */}}
+{{ $opts := dict "transpiler" "dartsass" "style" "compressed" }}
 
-{{ $style := slice }}
-
-{{/* SCSS first (so variables/mixins are available), then plain CSS */}}
-{{ range resources.Match "./**/*.scss" }}
-  {{ $style = $style | append . }}
-{{ end }}
-{{ range resources.Match "./**/*.css" }}
-  {{ $style = $style | append . }}
+{{ with resources.Get "scss/timelinejs.scss" }}
+  {{ $final := . | css.Sass $opts | resources.Minify | fingerprint }}
+  <link rel="stylesheet" href="{{ $final.RelPermalink }}" media="(prefers-color-scheme: light)">
+{{ else }}
+  {{ warnf "scss/timelinejs.scss not found in assets" }}
 {{ end }}
 
-{{ warnf "Found %d style files" (len $style) }}
-
-{{ $target := "css/main.css" }}
-
-{{ if gt (len $style) 0 }}
-  {{ $concatenated := $style | resources.Concat "bundle.css" }}
-  {{ $compiled := $concatenated | css.Sass (dict "outputStyle" "compressed") }}
-  {{ $final := $compiled | minify | fingerprint }}
-  <link rel="stylesheet" href="{{ $final.RelPermalink }}" integrity="{{ $final.Data.Integrity }}">
+{{ with resources.Get "scss/timelinejs-dark.scss" }}
+  {{ $final := . | css.Sass $opts | resources.Minify | fingerprint }}
+  <link rel="stylesheet" href="{{ $final.RelPermalink }}" media="(prefers-color-scheme: dark)">
+{{ else }}
+  {{ warnf "scss/timelinejs-dark.scss not found in assets" }}
 {{ end }}
